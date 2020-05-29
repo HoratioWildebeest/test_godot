@@ -8,6 +8,10 @@ var stats: = []
 var focus: = false
 var grabbed: = false
 
+enum scale_options {none, x, y, both}
+var scaled = scale_options.none
+var scale_area_width: = 8
+
 func _ready():
 	if Engine.is_editor_hint():
 		set_process(false)
@@ -38,21 +42,38 @@ func _input(event):
 			else:
 				$Label/Panel.modulate = background_color
 				grabbed = false
-	
+				scaled = scale_options.none
 	
 	if event is InputEventMouseButton:
 		if focus:
 			if event.button_index == BUTTON_LEFT:
 				if event.is_pressed():
 					var mouse_pos = get_local_mouse_position()
-					if mouse_pos.x >= 0 and mouse_pos.y >= 0 and mouse_pos.x <= rect_size.x and mouse_pos.y <= rect_size.y:
+					if (mouse_pos.x >= 0 and mouse_pos.y >= 0 and
+						mouse_pos.x < rect_size.x - scale_area_width and
+						mouse_pos.y < rect_size.y - scale_area_width
+					):
 						grabbed = true
+					elif mouse_pos.x >= rect_size.x - scale_area_width and mouse_pos.x <= rect_size.x:
+						if mouse_pos.y >= rect_size.y - scale_area_width and mouse_pos.y <= rect_size.y:
+							scaled = scale_options.both
+						else:
+							scaled = scale_options.x
+					elif mouse_pos.y >= rect_size.y - scale_area_width and mouse_pos.y <= rect_size.y:
+						scaled = scale_options.y
 				else:
 					grabbed = false
+					scaled = scale_options.none
 	
 	if event is InputEventMouseMotion:
 		if grabbed:
 			rect_global_position += event.relative
+		elif scaled == scale_options.both:
+			rect_size += event.relative
+		elif scaled == scale_options.x:
+			rect_size.x += event.relative.x
+		elif scaled == scale_options.y:
+			rect_size.y += event.relative.y
 
 func add_stat(stat_name, object, stat_ref, is_method):
 	stats.append([stat_name, object, stat_ref, is_method])
