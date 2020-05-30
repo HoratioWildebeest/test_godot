@@ -17,7 +17,7 @@ func _ready():
 		set_process(false)
 		set_process_input(false)
 	
-	$Label/Panel.modulate = background_color
+	$Panel.modulate = background_color
 
 func _process(delta):
 	var label_text = ""
@@ -38,9 +38,9 @@ func _input(event):
 		if event.scancode == KEY_QUOTELEFT and not event.is_pressed():
 			focus = not focus
 			if focus:
-				$Label/Panel.modulate = focus_color
+				$Panel.modulate = focus_color
 			else:
-				$Label/Panel.modulate = background_color
+				$Panel.modulate = background_color
 				grabbed = false
 				scaled = scale_options.none
 	
